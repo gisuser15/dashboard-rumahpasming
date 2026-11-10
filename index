@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembangunan Rumah Pasar Minggu</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            },
+            amber: {
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b1329;
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-card {
+      background: rgba(19, 29, 58, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.25s ease;
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.15);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- TOP ANNOUNCEMENT & STATUS BAR -->
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo & Project Identity -->
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-indigo-600 to-cyan-400 p-[2px] shadow-lg shadow-sky-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center">
+              <i data-lucide="home" class="w-6 h-6 text-sky-400"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800/60">
+                Laporan Realisasi Konstruksi
+              </span>
+              <span class="text-xs font-medium text-emerald-400 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Data Terhubung
+              </span>
+            </div>
+            <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <span id="proj-title">Pembangunan Rumah Pasar Minggu</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Header Actions: Sync & External Link -->
+        <div class="flex items-center space-x-3">
+          <button id="btn-sync" onclick="syncGoogleSheets()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 hover:border-sky-500/50 transition-all shadow-sm">
+            <i data-lucide="refresh-cw" id="sync-icon" class="w-3.5 h-3.5"></i>
+            <span>Sinkronkan Sheet</span>
+          </button>
+          
+          <a id="sheet-link" href="https://docs.google.com/spreadsheets/d/10NPojs4QgHb7g75RFPtf7C3kZDmpK7GPeFaEVcJNr30/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-md shadow-sky-500/20 transition-all">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+            <span>Buka Google Sheets</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metadata Tag Pills -->
+      <div class="py-2.5 border-t border-slate-800/50 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-y-2">
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-400"></i> <span id="proj-location">Jati Padang, Pasar Minggu</span></span>
+          <span class="flex items-center gap-1.5"><i data-lucide="maximize" class="w-3.5 h-3.5 text-amber-400"></i> Luas Bangunan: <strong class="text-slate-200" id="proj-area">30 m²</strong></span>
+          <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-sky-400"></i> Periode: <strong class="text-slate-200">April - Juli 2025</strong></span>
+        </div>
+        <div class="text-slate-400" id="last-updated-text">
+          Terakhir diperbarui: Data Spreadsheet Tab Realisasi
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="border-b border-slate-800 bg-slate-900/60 sticky top-28 z-30 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-2 no-scrollbar" aria-label="Tabs">
+        <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors bg-sky-500/10 text-sky-400 border border-sky-500/30">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard & Analisis</span>
+        </button>
+
+        <button onclick="switchTab('transactions')" id="tab-btn-transactions" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 transition-colors">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>Daftar Transaksi (<span id="tab-tx-count">363</span>)</span>
+        </button>
+
+        <button onclick="switchTab('timeline')" id="tab-btn-timeline" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 transition-colors">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+          <span>Milestone & Jadwal</span>
+        </button>
+
+        <button onclick="switchTab('funding')" id="tab-btn-funding" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-2 transition-colors">
+          <i data-lucide="wallet" class="w-4 h-4"></i>
+          <span>Arus Kas & Pinjaman</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+    <!-- ==================== TAB 1: DASHBOARD ==================== -->
+    <div id="tab-content-dashboard" class="tab-pane space-y-8">
+      
+      <!-- TOP KPI SUMMARY CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- 1. Total Saldo Awal (Ditukar ke posisi pertama) -->
+        <div class="glass-card glass-card-hover rounded-2xl p-5 relative overflow-hidden">
+          <div class="absolute -right-3 -top-3 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Saldo Awal</span>
+            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="piggy-bank" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-emerald-400 tracking-tight" id="kpi-initial-budget">Rp 114.000.000</div>
+          <div class="mt-2 text-xs text-slate-400">
+            Iyan Rp 50M • Rini Rp 43M • Emas Semar Rp 21M
+          </div>
+        </div>
+
+        <!-- 2. Total Realisasi Biaya (Ditukar ke posisi kedua) -->
+        <div class="glass-card glass-card-hover rounded-2xl p-5 relative overflow-hidden">
+          <div class="absolute -right-3 -top-3 w-20 h-20 bg-rose-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Realisasi Biaya</span>
+            <span class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-white tracking-tight" id="kpi-total-expense">Rp 190.693.643</div>
+          <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+            <span>Dari 9 Kategori Pekerjaan</span>
+            <span class="text-rose-400 font-semibold" id="kpi-item-count">363 Rincian Item</span>
+          </div>
+        </div>
+
+        <!-- Defisit / Saldo Akhir -->
+        <div class="glass-card glass-card-hover rounded-2xl p-5 relative overflow-hidden">
+          <div class="absolute -right-3 -top-3 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Selisih / Defisit Kas</span>
+            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <i data-lucide="scale" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-amber-400 tracking-tight" id="kpi-final-balance">-Rp 76.663.643</div>
+          <div class="mt-2 text-xs text-slate-400">
+            Biaya aktual melebihi saldo awal anggaran
+          </div>
+        </div>
+
+        <!-- Status Pinjaman -->
+        <div class="glass-card glass-card-hover rounded-2xl p-5 relative overflow-hidden">
+          <div class="absolute -right-3 -top-3 w-20 h-20 bg-sky-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Pinjaman</span>
+            <span class="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-sky-400 tracking-tight">100% LUNAS</div>
+          <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+            <span>Mamah 39.8M + Kantor 4M</span>
+            <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold text-[10px]">Lunas 2026</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHARTS SECTION: DONUT & BAR -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Donut Chart Distribusi Kategori -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-white uppercase tracking-wider">ALOKASI BIAYA PER KATEGORI</h2>
+              <p class="text-xs text-slate-400">Proporsi 9 kategori pekerjaan fisik</p>
+            </div>
+            <span class="text-xs font-medium px-2 py-1 rounded-lg bg-slate-800 text-sky-400">Chart.js</span>
+          </div>
+          <div class="relative flex-1 flex items-center justify-center min-h-[300px]">
+            <canvas id="categoryDonutChart"></canvas>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-800/80 text-xs text-slate-400 text-center">
+            Pekerjaan terbesar: <strong class="text-slate-200">BIAYA TUKANG BANGUNAN (37.6%)</strong> disusul <strong class="text-slate-200">STRUKTUR & DINDING (18.2%)</strong>
+          </div>
+        </div>
+
+        <!-- Right: Bar Chart Breakdown Nominal -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-6 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-white uppercase tracking-wider">NOMINAL BIAYA PER TAHAP / KATEGORI</h2>
+              <p class="text-xs text-slate-400">Nilai rupiah pengeluaran masing-masing pos</p>
+            </div>
+            <button onclick="switchTab('transactions')" class="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1">
+              Lihat Rincian <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div class="relative flex-1 min-h-[300px]">
+            <canvas id="categoryBarChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KARTU DAFTAR KATEGORI LENGKAP DENGAN PROGRESS / PERSENTASE -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+              <i data-lucide="layers" class="w-5 h-5 text-sky-400"></i>
+              RINCIAN 9 KATEGORI PEKERJAAN KONSTRUKSI
+            </h2>
+            <p class="text-xs text-slate-400">Klik salah satu kategori untuk langsung menyaring daftar transaksi</p>
+          </div>
+          <div class="text-xs text-slate-400">
+            Total Pengeluaran: <strong class="text-white">Rp 190.693.643</strong>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5" id="categories-card-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- TIMELINE PREVIEW STRIP -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+              <i data-lucide="calendar-check" class="w-5 h-5 text-indigo-400"></i>
+              TAHAPAN & JADWAL WAKTU PEKERJAAN LAPANGAN
+            </h2>
+            <p class="text-xs text-slate-400">Rangkaian 8 tahapan fisik dari pondasi hingga kelistrikan</p>
+          </div>
+          <button onclick="switchTab('timeline')" class="text-xs font-medium text-sky-400 hover:underline flex items-center gap-1">
+            Lihat Timeline Penuh <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3" id="milestones-mini-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: TRANSAKSI & FILTER ==================== -->
+    <div id="tab-content-transactions" class="tab-pane hidden space-y-6">
+      
+      <!-- FILTER & SEARCH CONTROL BAR -->
+      <div class="glass-card rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <!-- Search input -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input 
+              type="text" 
+              id="search-input" 
+              oninput="handleSearchFilter()" 
+              placeholder="Cari uraian barang (contoh: Semen, Bondek, Alderon, Tukang, Pipa, Granit)..." 
+              class="w-full bg-slate-900/90 text-sm text-slate-100 placeholder-slate-500 rounded-xl pl-10 pr-4 py-2.5 border border-slate-700/80 focus:outline-none focus:border-sky-500 transition-colors"
+            >
+          </div>
+
+          <!-- Quick Actions: Export CSV & Reset -->
+          <div class="flex items-center space-x-2">
+            <button onclick="resetFilters()" class="px-3.5 py-2.5 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Reset</span>
+            </button>
+            <button onclick="exportFilteredCsv()" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Ekspor CSV</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Filter Dropdowns Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+          
+          <!-- Filter Kategori -->
+          <div>
+            <label class="block font-medium text-slate-400 mb-1">Kategori Pekerjaan</label>
+            <select id="filter-category" onchange="handleSearchFilter()" class="w-full bg-slate-900 text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-sky-500">
+              <option value="ALL">Semua Kategori (9)</option>
+              <option value="A">A - Pekerjaan Sumur Air</option>
+              <option value="B">B - Biaya Tukang Bangunan</option>
+              <option value="C">C - Struktur & Dinding</option>
+              <option value="D">D - Dag Lantai 2</option>
+              <option value="E">E - Dinding Lantai 2</option>
+              <option value="F">F - Pekerjaan Atap</option>
+              <option value="G">G - Saluran Air</option>
+              <option value="H">H - Pintu, Kusen & Granit</option>
+              <option value="I">I - Mekanikal Elektrikal</option>
+            </select>
+          </div>
+
+          <!-- Filter Sumber Dana -->
+          <div>
+            <label class="block font-medium text-slate-400 mb-1">Sumber Dana</label>
+            <select id="filter-source" onchange="handleSearchFilter()" class="w-full bg-slate-900 text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-sky-500">
+              <option value="ALL">Semua Sumber Dana</option>
+              <option value="Iyan">Iyan</option>
+              <option value="Rini">Rini</option>
+              <option value="Emas Semar">Emas Semar</option>
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <div>
+            <label class="block font-medium text-slate-400 mb-1">Urutan (Sort)</label>
+            <select id="filter-sort" onchange="handleSearchFilter()" class="w-full bg-slate-900 text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-sky-500">
+              <option value="default">Sesuai Spreadsheet (Default)</option>
+              <option value="price-desc">Harga Tertinggi</option>
+              <option value="price-asc">Harga Terendah</option>
+              <option value="date-desc">Tanggal Terbaru</option>
+              <option value="date-asc">Tanggal Terlama</option>
+            </select>
+          </div>
+
+          <!-- Items per page -->
+          <div>
+            <label class="block font-medium text-slate-400 mb-1">Baris per Halaman</label>
+            <select id="filter-per-page" onchange="handleSearchFilter()" class="w-full bg-slate-900 text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-sky-500">
+              <option value="20">20 Baris</option>
+              <option value="50">50 Baris</option>
+              <option value="100">100 Baris</option>
+              <option value="ALL">Tampilkan Semua (363)</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Filter Result Counter & Total Sum Badge -->
+        <div class="flex items-center justify-between text-xs pt-1 text-slate-400">
+          <div>
+            Menampilkan <strong class="text-sky-400" id="filter-count">0</strong> dari <strong class="text-white" id="filter-total-count">363</strong> data item
+          </div>
+          <div class="flex items-center gap-2">
+            <span>Subtotal Filter:</span>
+            <span class="px-2.5 py-1 rounded-md bg-sky-950/80 text-sky-300 font-bold border border-sky-800/80" id="filter-subtotal">Rp 0</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TRANSACTION TABLE CARD -->
+      <div class="glass-card rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-900/90 text-slate-300 uppercase tracking-wider font-semibold border-b border-slate-800">
+                <th class="py-3.5 px-4 w-14 text-center">No</th>
+                <th class="py-3.5 px-4">Uraian Pekerjaan / Material</th>
+                <th class="py-3.5 px-3">Tanggal</th>
+                <th class="py-3.5 px-3">Sumber</th>
+                <th class="py-3.5 px-3 text-right">Volume</th>
+                <th class="py-3.5 px-3 text-right">Harga Satuan</th>
+                <th class="py-3.5 px-4 text-right">Jumlah Harga</th>
+                <th class="py-3.5 px-4 text-right text-slate-400">Saldo Running</th>
+                <th class="py-3.5 px-4">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="transaction-table-body" class="divide-y divide-slate-800/60 font-normal">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TABLE PAGINATION FOOTER -->
+        <div class="p-4 bg-slate-900/80 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div class="text-slate-400" id="pagination-info">
+            Halaman 1 dari 1
+          </div>
+          <div class="flex items-center space-x-1" id="pagination-controls">
+            <!-- Buttons rendered via JavaScript -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 3: TIMELINE & JADWAL ==================== -->
+    <div id="tab-content-timeline" class="tab-pane hidden space-y-6">
+      
+      <div class="glass-card rounded-2xl p-6">
+        <div class="max-w-2xl">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-indigo-400"></i>
+            Kronologi Tahapan Pembangunan Rumah
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Data jadwal pelaksanaan konstruksi nyata sesuai catatan lapangan di Google Sheets (Tab Realisasi baris 406-414).
+          </p>
+        </div>
+
+        <!-- Horizontal/Vertical Step Line -->
+        <div class="mt-8 relative border-l-2 border-indigo-500/30 ml-4 sm:ml-6 pl-6 sm:pl-8 space-y-8" id="timeline-stepper-container">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 4: ARUS KAS & PINJAMAN ==================== -->
+    <div id="tab-content-funding" class="tab-pane hidden space-y-6">
+      
+      <!-- Funding Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- Saldo Modal Awal -->
+        <div class="glass-card rounded-2xl p-6 space-y-4 border border-emerald-500/20">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Komposisi Modal Awal</h3>
+            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400"><i data-lucide="coins" class="w-4 h-4"></i></span>
+          </div>
+          <div class="text-2xl font-extrabold text-emerald-400">Rp 114.000.000</div>
+          <div class="space-y-2 text-xs border-t border-slate-800 pt-3 text-slate-300">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Kontribusi Iyan:</span>
+              <strong class="text-white">Rp 50.000.000</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Kontribusi Rini:</span>
+              <strong class="text-white">Rp 43.000.000</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Emas Semar:</span>
+              <strong class="text-white">Rp 21.000.000</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pinjaman Mamah (LUNAS) -->
+        <div class="glass-card rounded-2xl p-6 space-y-4 border border-sky-500/20">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Pinjaman Tambahan Mamah</h3>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+              100% LUNAS
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-white">Rp 39.800.000</div>
+          <div class="space-y-2 text-xs border-t border-slate-800 pt-3 text-slate-300">
+            <div class="flex justify-between">
+              <span class="text-slate-400">09 Juni 2025:</span>
+              <span>Rp 31.000.000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">30 Juni 2025:</span>
+              <span>Rp 1.100.000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">08 Juli 2025:</span>
+              <span>Rp 7.700.000</span>
+            </div>
+            <div class="pt-2 border-t border-slate-800/50 flex justify-between text-emerald-400 font-semibold">
+              <span>Pelunasan (16 Sep 2026):</span>
+              <span>Lunas Penuh</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pinjaman Kantor (LUNAS) -->
+        <div class="glass-card rounded-2xl p-6 space-y-4 border border-indigo-500/20">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Pinjaman Kantor</h3>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+              100% LUNAS
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold text-white">Rp 4.000.000</div>
+          <div class="space-y-2 text-xs border-t border-slate-800 pt-3 text-slate-300">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Tanggal Pencairan:</span>
+              <span>14 Juli 2025</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Status Pembayaran:</span>
+              <strong class="text-emerald-400">Lunas Langsung</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Tujuan:</span>
+              <span>Tutup Kebutuhan Akhir Tukang</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Detail Rekapitulasi Sumber Kas -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="scale" class="w-5 h-5 text-amber-400"></i>
+          Posisi Kas Akhir Berdasarkan Sumber Rekening
+        </h3>
+        <p class="text-xs text-slate-400">Tercatat pada tabel evaluasi penutupan buku proyek di spreadsheet:</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1">Saldo Tahap 2</span>
+            <span class="text-base font-bold text-sky-400">Rp 21.912.839</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1">Saldo Iyan</span>
+            <span class="text-base font-bold text-emerald-400">Rp 1.158.216</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1">Saldo Rini</span>
+            <span class="text-base font-bold text-rose-400">-Rp 7.000.000</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1">Saldo Emas Semar</span>
+            <span class="text-base font-bold text-amber-400">Rp 1.191.513</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 border border-sky-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs sm:text-sm">
+      <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+      <span id="toast-message">Pesan notifikasi</span>
+    </div>
+  </div>
+
+  <!-- SCRIPT FILES -->
+  <!-- 1. Offline Bundled Data -->
+  <script src="data.js"></script>
+  <!-- 2. Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
